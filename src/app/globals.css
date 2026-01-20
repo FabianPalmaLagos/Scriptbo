@@ -2,6 +2,7 @@
 /* Design System basado en referencia visual del usuario */
 
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ============================================
    CUSTOM PROPERTIES (CSS Variables)
@@ -387,8 +388,40 @@ h6 {
    ============================================ */
 
 .prose-scriptbo {
-  color: hsl(var(--foreground-muted));
+  @apply prose prose-invert max-w-none focus:outline-none relative;
+  padding: 80px 100px !important;
+  /* Fondo de página en bloques definidos (A4) con gap reducido */
+  background-image: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1123px,
+      rgb(13, 10, 31) 1123px,
+      rgb(13, 10, 31) 1173px);
+  background-size: 100% 1173px;
+  /* 1123 hoja + 50 gap */
+  background-repeat: repeat-y;
+  min-height: 1123px;
+  backdrop-filter: blur(8px);
   line-height: 1.8;
+  outline: none !important;
+}
+
+/* Page Gap Widget (Invisible Spacer) */
+.page-gap-widget {
+  /* Height set dynamically by JS */
+  margin: 0;
+  @apply w-full pointer-events-none select-none relative;
+  /* Transparent to reveal CSS background */
+  background: transparent;
+  width: 100%;
+}
+
+.page-divider-line {
+  @apply w-full h-px border-t border-dashed border-white/10 my-4;
+}
+
+.page-footer,
+.page-header {
+  @apply text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] opacity-80;
 }
 
 .prose-scriptbo h3 {

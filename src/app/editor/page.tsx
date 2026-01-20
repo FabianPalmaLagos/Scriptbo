@@ -3,12 +3,46 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button, IconButton } from '@/components/ui';
+import { TiptapEditor } from '@/components/editor/TiptapEditor';
 
 export default function EditorPage() {
     const [showAiPanel, setShowAiPanel] = useState(true);
+    const [content, setContent] = useState<any>({
+        type: 'doc',
+        content: [
+            {
+                type: 'heading',
+                attrs: { level: 2, textAlign: 'center' },
+                content: [{ type: 'text', text: 'The Great Blackout' }],
+            },
+            {
+                type: 'paragraph',
+                attrs: { textAlign: 'justify' },
+                content: [
+                    { type: 'text', text: 'The sky above the port was the color of television, tuned to a dead channel—if televisions hadn\'t been obsolete for fifty years. Elias pulled his coat tighter against the acid rain, the holographic advertisements of Sector 7 flickering in puddles of iridescent oil.' },
+                ],
+            },
+            {
+                type: 'paragraph',
+                content: [
+                    { type: 'text', text: '"You\'re late," Kael said, not turning around. The cyborg was leaning against a rusted railing, watching the magnet-trains glide silently over the abyss.' },
+                ],
+            },
+            {
+                type: 'paragraph',
+                content: [
+                    { type: 'text', text: 'Elias checked his chrono. "Time is relative in the Neo-Sector, old friend. Especially when you\'re trying to reverse entropy."' },
+                ],
+            },
+        ],
+    });
+
+    const handleEditorChange = (newContent: any) => {
+        setContent(newContent);
+    };
 
     return (
-        <div className="flex h-full w-full">
+        <div className="flex h-full w-full bg-[#0d0a1f]">
             {/* Left: Navigation / Structure (Collapsed) */}
             <aside className="hidden md:flex flex-col w-12 h-full border-r border-white/5 bg-[#0a0817] z-20 items-center py-4 gap-4">
                 <Link href="/dashboard" className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
@@ -27,7 +61,7 @@ export default function EditorPage() {
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Chapters</span>
                     <IconButton icon="add" size="sm" />
                 </div>
-                <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
+                <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1 custom-scrollbar">
                     <ChapterItem number="01" title="The Great Blackout" active />
                     <ChapterItem number="02" title="Neon Shadows" />
                     <ChapterItem number="03" title="Entropy's Kiss" />
@@ -45,133 +79,109 @@ export default function EditorPage() {
                 </div>
             </aside>
 
-            {/* Center: Zen Editor */}
-            <main className="flex-1 relative flex flex-col h-full bg-[#0d0a1f]">
-
-                {/* Top Bar */}
-                <header className="flex items-center justify-between px-8 py-4 border-b border-white/5 bg-[#0d0a1f]/80 backdrop-blur-sm z-30">
+            {/* Center: Robust Editor */}
+            <main className="flex-1 relative flex flex-col h-full overflow-hidden">
+                {/* Top Bar (Project Info & Primary Actions) */}
+                <header className="flex items-center justify-between px-8 py-3 border-b border-white/5 bg-[#0d0a1f] z-30">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-white font-semibold">Echoes of Entropy</h1>
-                        <span className="text-slate-600">/</span>
-                        <span className="text-slate-400 text-sm">Chapter 1</span>
+                        <div className="h-8 w-8 rounded bg-[hsl(165,100%,38%)]/10 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-[hsl(165,100%,38%)] text-[20px]">description</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <h1 className="text-white text-sm font-bold leading-none mb-1">Echoes of Entropy</h1>
+                            <span className="text-[10px] text-slate-500 font-mono tracking-widest">PROJECT ID: SCB-2026-0X</span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-xs text-slate-500 hidden md:block">Saving...</span>
-                        <Button variant="ghost" size="sm" icon="history">History</Button>
-                        <Button variant="secondary" size="sm" icon="play_circle">Read Aloud</Button>
+                        <Button variant="ghost" size="sm" icon="cloud_done" className="text-emerald-500 text-[10px] font-bold">Synced</Button>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                        <Button variant="secondary" size="sm" icon="visibility">Preview</Button>
                         <Button size="sm" icon="ios_share">Export</Button>
-                        <div className="w-[1px] h-6 bg-white/10 mx-1" />
                         <IconButton
                             icon="auto_awesome"
-                            className={showAiPanel ? 'text-[hsl(165,100%,38%)] bg-[hsl(165,100%,38%)]/10' : ''}
+                            className={showAiPanel ? 'text-[hsl(165,100%,38%)] bg-[hsl(165,100%,38%)]/10 shadow-neon' : ''}
                             onClick={() => setShowAiPanel(!showAiPanel)}
                         />
                     </div>
                 </header>
 
-                {/* Editor Area */}
-                <div className="flex-1 overflow-y-auto relative">
-                    <div className="max-w-3xl mx-auto py-16 px-8 min-h-full">
-                        <input
-                            type="text"
-                            className="w-full bg-transparent text-4xl font-bold text-white mb-8 border-none focus:ring-0 placeholder-slate-600 px-0"
-                            defaultValue="The Great Blackout"
-                        />
-
-                        <div className="prose-scriptbo text-lg leading-relaxed text-slate-300">
-                            <p>The sky above the port was the color of television, tuned to a dead channel—if televisions hadn't been obsolete for fifty years. Elias pulled his coat tighter against the acid rain, the holographic advertisements of Sector 7 flickering in puddles of iridescent oil.</p>
-
-                            <p>"You're late," Kael said, not turning around. The cyborg was leaning against a rusted railing, watching the magnet-trains glide silently over the abyss.</p>
-
-                            <p>Elias checked his chrono. "Time is relative in the Neo-Sector, old friend. Especially when you're trying to reverse entropy."</p>
-
-                            <p>Kael chuckled, the sound like grinding gears. "Only you would try to fix the universe with a screwdriver and a bad attitude."</p>
-
-                            <p>The wind picked up, carrying the scent of ozone and burning plastic. It was the smell of home. It was the smell of the end of the world.</p>
-
-                            {/* Cursor / Writing Indicator */}
-                            <p className="flex items-center">
-                                <span className="w-0.5 h-6 bg-[hsl(165,100%,38%)] animate-pulse inline-block mr-1"></span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bottom Bar: Stats */}
-                <div className="absolute bottom-0 left-0 right-0 py-2 px-6 bg-[#0d0a1f] border-t border-white/5 flex justify-between text-xs text-slate-500">
-                    <div className="flex gap-4">
-                        <span>Words: 4,520</span>
-                        <span>Characters: 24,105</span>
-                        <span>Reading Time: 18m</span>
-                    </div>
-                    <div>
-                        <span>Markdown Supported</span>
-                    </div>
+                {/* Main Content Area (Full Canvas) */}
+                <div className="flex-1 overflow-hidden bg-[#0d0a1f]">
+                    <TiptapEditor
+                        content={content}
+                        onChange={handleEditorChange}
+                        className=""
+                    />
                 </div>
             </main>
 
             {/* Right: AI Co-author Panel */}
             {showAiPanel && (
-                <aside className="w-[340px] border-l border-white/5 bg-[#0a0817] flex flex-col z-20 animate-slide-up">
-                    <div className="p-4 border-b border-white/5 flex items-center justify-between">
+                <aside className="w-[380px] border-l border-white/5 bg-[#0a0817] flex flex-col z-20 animate-slide-up shadow-2xl">
+                    <div className="p-4 border-b border-white/5 flex items-center justify-between bg-[#1A172E]/30">
                         <h2 className="text-sm font-bold text-white flex items-center gap-2">
                             <span className="material-symbols-outlined text-[hsl(165,100%,38%)]">auto_awesome</span>
-                            Co-Author
+                            AI Co-Author
                         </h2>
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-[hsl(165,100%,38%)] font-mono px-2 py-0.5 rounded bg-[hsl(165,100%,38%)]/10">340 cr</span>
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Gemini 3 Pro</span>
                             <IconButton icon="close" size="sm" onClick={() => setShowAiPanel(false)} />
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+                        {/* Status Stats */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <span className="text-[10px] text-slate-500 block mb-1">Credits</span>
+                                <span className="text-sm font-bold text-white">45,280</span>
+                            </div>
+                            <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <span className="text-[10px] text-slate-500 block mb-1">Context Usage</span>
+                                <span className="text-sm font-bold text-white">12.4%</span>
+                            </div>
+                        </div>
 
                         {/* Suggestion Card */}
-                        <div className="glass-panel rounded-xl p-4 border border-[hsl(165,100%,38%)]/20">
-                            <p className="text-xs font-bold text-[hsl(165,100%,38%)] mb-2 uppercase tracking-wide">Suggested Continuation</p>
-                            <p className="text-sm text-slate-300 mb-3">
-                                Kael turned finally, his optic eye whirring as it focused. "Do you have the data drive?" he asked, voice dropping to a whisper.
+                        <div className="glass-panel-heavy rounded-2xl p-5 border-l-4 border-l-[hsl(165,100%,38%)] shadow-neon">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="h-2 w-2 rounded-full bg-[hsl(165,100%,38%)] animate-pulse" />
+                                <p className="text-[10px] font-bold text-[hsl(165,100%,38%)] uppercase tracking-widest leading-none">Smart Continuation</p>
+                            </div>
+                            <p className="text-sm text-slate-200 leading-relaxed mb-4 italic">
+                                "The magnetic pulse rippled through the sector, silencing the endless hum of the city. For the first time in centuries, Elias heard his own heartbeat."
                             </p>
                             <div className="flex gap-2">
-                                <Button size="sm" className="w-full">Insert</Button>
-                                <IconButton size="sm" icon="refresh" />
+                                <Button size="sm" className="w-full py-2.5 font-bold tracking-tight">Insert Suggestion</Button>
+                                <IconButton size="sm" icon="refresh" className="bg-white/5" />
                             </div>
                         </div>
 
-                        {/* Quick Actions */}
-                        <div>
-                            <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Quick Actions</h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                <QuickActionButton icon="notes" label="Describe" />
-                                <QuickActionButton icon="bolt" label="Action" />
-                                <QuickActionButton icon="chat" label="Dialogue" />
-                                <QuickActionButton icon="psychology" label="Brainstorm" />
+                        {/* Analysis Group */}
+                        <div className="space-y-4">
+                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Story Analysis</h3>
+                            <div className="bg-white/5 rounded-2xl p-4 border border-white/5 space-y-4">
+                                <AnalysisMetric label="Tension" value={82} />
+                                <AnalysisMetric label="Mystery" value={65} />
+                                <AnalysisMetric label="Pacing" value={45} />
                             </div>
                         </div>
-
-                        {/* Analysis */}
-                        <div>
-                            <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Scene Analysis</h3>
-                            <div className="space-y-3">
-                                <AnalysisMetric label="Tension" value={75} />
-                                <AnalysisMetric label="Pacing" value={40} />
-                                <AnalysisMetric label="Sentiment" value={-20} />
-                            </div>
-                        </div>
-
                     </div>
 
-                    {/* Chat Input */}
-                    <div className="p-4 border-t border-white/5">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Ask Gemini to help..."
-                                className="w-full bg-[hsl(252,29%,14%)] border border-white/10 rounded-xl py-3 pl-4 pr-10 text-sm text-white focus:outline-none focus:border-[hsl(165,100%,38%)]/50 transition-colors"
-                            />
-                            <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[hsl(165,100%,38%)] text-[#0d0a1f] hover:bg-white transition-colors">
-                                <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
-                            </button>
+                    <div className="p-4 border-t border-white/5 bg-[#0d0a1f]">
+                        <div className="relative group">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[hsl(165,100%,38%)] to-blue-500 rounded-2xl blur opacity-10 group-focus-within:opacity-30 transition duration-500"></div>
+                            <div className="relative flex items-center bg-[#1A172E] border border-white/10 rounded-2xl overflow-hidden px-4 py-1">
+                                <span className="material-symbols-outlined text-slate-500 text-[20px] mr-2">chat_bubble</span>
+                                <input
+                                    type="text"
+                                    placeholder="Ask Gemini to refine..."
+                                    className="flex-1 bg-transparent py-3 text-sm text-white focus:outline-none placeholder-slate-600"
+                                />
+                                <button className="ml-2 p-1.5 rounded-xl bg-[hsl(165,100%,38%)] text-[#0d0a1f] hover:scale-105 active:scale-95 transition-all">
+                                    <span className="material-symbols-outlined text-[18px] font-bold">arrow_upward</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </aside>
@@ -192,35 +202,28 @@ function NavIcon({ icon, active, className }: { icon: string; active?: boolean; 
 
 function ChapterItem({ number, title, active }: { number: string; title: string; active?: boolean }) {
     return (
-        <button className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${active ? 'bg-white/5 border border-white/5 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
-            <span className={`text-xs font-mono ${active ? 'text-[hsl(165,100%,38%)]' : 'text-slate-600'}`}>{number}</span>
-            <span className="text-sm font-medium truncate">{title}</span>
-        </button>
-    );
-}
-
-function QuickActionButton({ icon, label }: { icon: string; label: string }) {
-    return (
-        <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[hsl(165,100%,38%)]/30 transition-all gap-1 group">
-            <span className="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[hsl(165,100%,38%)] transition-colors">{icon}</span>
-            <span className="text-xs font-medium text-slate-400 group-hover:text-white transition-colors">{label}</span>
+        <button className={`flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all ${active ? 'bg-white/10 border border-white/10 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+            <div className={`text-[10px] font-mono w-5 h-5 rounded flex items-center justify-center ${active ? 'bg-[hsl(165,100%,38%)] text-[#0d0a1f]' : 'bg-white/5 text-slate-600'}`}>
+                {number}
+            </div>
+            <span className="text-sm font-semibold truncate flex-1">{title}</span>
         </button>
     );
 }
 
 function AnalysisMetric({ label, value }: { label: string; value: number }) {
-    // Normalize value -100 to 100 or 0 to 100
-    const displayValue = Math.abs(value);
     return (
-        <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 w-16">{label}</span>
-            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+        <div className="space-y-1.5">
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <span>{label}</span>
+                <span className="text-white">{value}%</span>
+            </div>
+            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
-                    className="h-full bg-[hsl(165,100%,38%)] rounded-full transition-all"
-                    style={{ width: `${displayValue}%` }}
+                    className="h-full bg-gradient-to-r from-[hsl(165,100%,38%)] to-[hsl(165,100%,58%)] rounded-full transition-all duration-1000"
+                    style={{ width: `${value}%` }}
                 />
             </div>
-            <span className="text-xs text-white font-mono w-8 text-right">{value}%</span>
         </div>
     );
 }
