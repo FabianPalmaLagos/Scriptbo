@@ -14,8 +14,9 @@ const navItems: NavItem[] = [
     { href: '/dashboard', label: 'Projects', icon: 'folder' },
     { href: '/story-bible', label: 'Story Bible', icon: 'auto_stories' },
     { href: '/editor', label: 'Editor', icon: 'edit_note' },
-    { href: '/characters', label: 'Characters', icon: 'diversity_3' },
-    { href: '/world', label: 'World', icon: 'location_on' },
+    { href: '/story-bible/characters', label: 'Characters', icon: 'diversity_3' },
+    { href: '/story-bible/locations', label: 'Locations', icon: 'location_on' },
+    { href: '/story-bible/world', label: 'World', icon: 'public' },
 ];
 
 export function Sidebar() {
