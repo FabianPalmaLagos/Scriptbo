@@ -1,0 +1,280 @@
+// Scriptbo - Prisma Schema v2.0
+// Diseñado para Supabase PostgreSQL con pgvector
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [vector]
+}
+
+// ============================================
+// USUARIOS Y AUTENTICACIÓN
+// ============================================
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String?
+  image             String?
+
+  // Preferencias de usuario
+  locale            String   @default("es") // es, en
+  timezone          String?
+
+  // Suscripción
+  tier              SubscriptionTier @default(FREE)
+  creditsRemaining  Int              @default(50000)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relaciones
+  projects          Project[]
+  subscriptions     Subscription[]
+  transactions      CreditTransaction[]
+
+  @@index([email])
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+model Subscription {
+  id               String             @id @default(uuid())
+  userId           String
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status           SubscriptionStatus @default(ACTIVE)
+  priceId          String
+  stripeId         String?            @unique
+  currentPeriodEnd DateTime
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([userId])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+// ============================================
+// GESTIÓN DE PROYECTOS
+// ============================================
+
+model Project {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?       @db.Text
+
+  // Múltiples géneros por proyecto
+  genres      Genre[]       @default([NOVEL])
+
+  // Idioma del contenido
+  language    String        @default("es")
+
+  status      ProjectStatus @default(ACTIVE)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?     // Soft delete
+
+  // Relaciones
+  documents       Document[]
+  storyBibleItems StoryBibleItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum Genre {
+  NOVEL
+  SCRIPT
+  SHORT_STORY
+  ANIME
+  MANHWA
+  MANHUA
+  NON_FICTION
+  ARTICLE
+  POETRY
+  FANFICTION
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+// ============================================
+// DOCUMENTOS Y CAPÍTULOS
+// ============================================
+
+model Document {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  title     String
+  content   Json?    // Estado del editor (Tiptap)
+  order     Int      @default(0)
+
+  // Métricas
+  wordCount Int      @default(0)
+  charCount Int      @default(0)
+
+  // Tracking de asistencia IA
+  aiAssistanceRatio Float? // 0.0 - 1.0
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  versions  Version[]
+
+  @@index([projectId])
+  @@index([order])
+}
+
+model Version {
+  id         String   @id @default(uuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  content    Json
+  wordCount  Int      @default(0)
+
+  createdAt  DateTime @default(now())
+
+  @@index([documentId])
+  @@index([createdAt])
+}
+
+// ============================================
+// STORY BIBLE (Biblioteca del Proyecto)
+// ============================================
+
+model StoryBibleItem {
+  id        String             @id @default(uuid())
+  projectId String
+  project   Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  name      String
+  type      StoryBibleItemType
+  content   Json               // Estructura flexible
+
+  // Vector para búsqueda semántica (768 dims para Google embeddings)
+  embedding Unsupported("vector(768)")?
+
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([projectId])
+  @@index([type])
+}
+
+enum StoryBibleItemType {
+  CHARACTER
+  LOCATION
+  WORLD_BUILDING
+  OBJECT
+  PLOT_POINT
+  TIMELINE_EVENT
+  RELATIONSHIP
+  NOTE
+}
+
+// ============================================
+// PLANTILLAS DE GÉNERO
+// ============================================
+
+model GenreTemplate {
+  id          String   @id @default(uuid())
+  genre       Genre
+  name        String   // "Viaje del Héroe", "3 Actos", "Kishotenketsu"
+  description String?
+  structure   Json     // { acts: [...], beats: [...] }
+
+  isSystem    Boolean  @default(false)
+  createdBy   String?  // null = sistema
+
+  locale      String   @default("es")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([genre])
+  @@index([isSystem])
+}
+
+// ============================================
+// ECONOMÍA DE IA (Créditos)
+// ============================================
+
+model CreditTransaction {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount      Int             // Positivo para recargas, Negativo para consumo
+  type        TransactionType
+
+  // Tracking detallado de acciones IA
+  aiAction    AIActionType?
+
+  // Métricas de uso
+  inputTokens  Int?
+  outputTokens Int?
+  modelUsed    String?        // "gemini-3-pro", "gemini-3-flash"
+  cached       Boolean        @default(false)
+
+  description  String?
+
+  // Referencias opcionales
+  projectId    String?
+  documentId   String?
+
+  createdAt    DateTime       @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+enum TransactionType {
+  GRANT
+  PURCHASE
+  CONSUMPTION
+  REFUND
+  BONUS
+}
+
+enum AIActionType {
+  CONTINUE
+  EXPAND
+  REWRITE
+  BRAINSTORM
+  DESCRIBE
+  GRAMMAR_CHECK
+  STYLE_IMPROVE
+  DIALOGUE
+  ANALYZE
+}
