@@ -1,0 +1,16 @@
+services:
+  db:
+    image: ankane/pgvector:v0.5.1
+    container_name: scriptbo_db
+    restart: always
+    environment:
+      POSTGRES_USER: scriptbo_admin
+      POSTGRES_PASSWORD: scriptbo_password
+      POSTGRES_DB: scriptbo_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
