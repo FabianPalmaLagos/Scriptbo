@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button, IconButton } from '@/components/ui';
 import { TiptapEditor } from '@/components/editor/TiptapEditor';
+import { AiSidebar } from '@/components/editor/AiSidebar';
 
 export default function EditorPage() {
     const [showAiPanel, setShowAiPanel] = useState(true);
@@ -111,81 +112,13 @@ export default function EditorPage() {
                         content={content}
                         onChange={handleEditorChange}
                         className=""
+                        isAiPanelOpen={showAiPanel}
                     />
                 </div>
             </main>
 
             {/* Right: AI Co-author Panel */}
-            {showAiPanel && (
-                <aside className="w-[380px] border-l border-white/5 bg-[#0a0817] flex flex-col z-20 animate-slide-up shadow-2xl">
-                    <div className="p-4 border-b border-white/5 flex items-center justify-between bg-[#1A172E]/30">
-                        <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[hsl(165,100%,38%)]">auto_awesome</span>
-                            AI Co-Author
-                        </h2>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Gemini 3 Pro</span>
-                            <IconButton icon="close" size="sm" onClick={() => setShowAiPanel(false)} />
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-                        {/* Status Stats */}
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                <span className="text-[10px] text-slate-500 block mb-1">Credits</span>
-                                <span className="text-sm font-bold text-white">45,280</span>
-                            </div>
-                            <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                <span className="text-[10px] text-slate-500 block mb-1">Context Usage</span>
-                                <span className="text-sm font-bold text-white">12.4%</span>
-                            </div>
-                        </div>
-
-                        {/* Suggestion Card */}
-                        <div className="glass-panel-heavy rounded-2xl p-5 border-l-4 border-l-[hsl(165,100%,38%)] shadow-neon">
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="h-2 w-2 rounded-full bg-[hsl(165,100%,38%)] animate-pulse" />
-                                <p className="text-[10px] font-bold text-[hsl(165,100%,38%)] uppercase tracking-widest leading-none">Smart Continuation</p>
-                            </div>
-                            <p className="text-sm text-slate-200 leading-relaxed mb-4 italic">
-                                "The magnetic pulse rippled through the sector, silencing the endless hum of the city. For the first time in centuries, Elias heard his own heartbeat."
-                            </p>
-                            <div className="flex gap-2">
-                                <Button size="sm" className="w-full py-2.5 font-bold tracking-tight">Insert Suggestion</Button>
-                                <IconButton size="sm" icon="refresh" className="bg-white/5" />
-                            </div>
-                        </div>
-
-                        {/* Analysis Group */}
-                        <div className="space-y-4">
-                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Story Analysis</h3>
-                            <div className="bg-white/5 rounded-2xl p-4 border border-white/5 space-y-4">
-                                <AnalysisMetric label="Tension" value={82} />
-                                <AnalysisMetric label="Mystery" value={65} />
-                                <AnalysisMetric label="Pacing" value={45} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="p-4 border-t border-white/5 bg-[#0d0a1f]">
-                        <div className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[hsl(165,100%,38%)] to-blue-500 rounded-2xl blur opacity-10 group-focus-within:opacity-30 transition duration-500"></div>
-                            <div className="relative flex items-center bg-[#1A172E] border border-white/10 rounded-2xl overflow-hidden px-4 py-1">
-                                <span className="material-symbols-outlined text-slate-500 text-[20px] mr-2">chat_bubble</span>
-                                <input
-                                    type="text"
-                                    placeholder="Ask Gemini to refine..."
-                                    className="flex-1 bg-transparent py-3 text-sm text-white focus:outline-none placeholder-slate-600"
-                                />
-                                <button className="ml-2 p-1.5 rounded-xl bg-[hsl(165,100%,38%)] text-[#0d0a1f] hover:scale-105 active:scale-95 transition-all">
-                                    <span className="material-symbols-outlined text-[18px] font-bold">arrow_upward</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-            )}
+            <AiSidebar isOpen={showAiPanel} onClose={() => setShowAiPanel(false)} />
         </div>
     );
 }

@@ -20,9 +20,10 @@ interface TiptapEditorProps {
     onChange: (content: any) => void;
     className?: string;
     placeholder?: string;
+    isAiPanelOpen?: boolean;
 }
 
-export function TiptapEditor({ content, onChange, className, placeholder = "Erase once, write twice..." }: TiptapEditorProps) {
+export function TiptapEditor({ content, onChange, className, placeholder = "Erase once, write twice...", isAiPanelOpen = false }: TiptapEditorProps) {
     const editor = useEditor({
         immediatelyRender: false,
         extensions: [
@@ -130,7 +131,7 @@ export function TiptapEditor({ content, onChange, className, placeholder = "Eras
     if (!editor) return null;
 
     return (
-        <div className="flex flex-col w-full h-full overflow-hidden">
+        <div className="relative flex flex-col w-full h-full overflow-hidden">
             {/* Barra de Herramientas Estilo Word (Fija) */}
             <div className="flex-none z-50">
                 <EditorToolbar editor={editor} className="rounded-none border-b border-white/5" />
@@ -189,7 +190,7 @@ export function TiptapEditor({ content, onChange, className, placeholder = "Eras
             </div>
 
             {/* Stats flotantes */}
-            <div className="fixed bottom-8 right-8 z-40 flex items-center gap-4 bg-black/60 backdrop-blur-xl border border-white/5 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest text-slate-500 uppercase shadow-neon">
+            <div className="absolute bottom-8 right-8 z-40 flex items-center gap-4 bg-black/60 backdrop-blur-xl border border-white/5 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest text-slate-500 uppercase shadow-neon transition-all duration-300">
                 <span className="flex items-center gap-1.5 text-[hsl(165,100%,38%)]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[hsl(165,100%,38%)] animate-pulse" />
                     {editor.storage.characterCount.words()} PALABRAS
