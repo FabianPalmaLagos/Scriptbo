@@ -435,7 +435,35 @@ h6 {
   margin-bottom: 1.5rem;
 }
 
-.prose-scriptbo blockquote {
+/* Dedication Block (Targeted Class) */
+/* This allows inner text alignment to be anything (Left/Center/Right) */
+.prose-scriptbo blockquote.dedication-block {
+  border: none;
+  background: transparent;
+  padding: 0;
+
+  /* Vertical Centering Logic for A4 Page */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Vertically center the block content */
+  align-items: stretch;
+  /* Allow full width for text alignment */
+  min-height: 900px;
+  /* Occupy most of the A4 page height */
+  margin: 0;
+
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  line-height: 2;
+  border-radius: 0;
+}
+
+/* Standard Blockquote (Everything else) */
+.prose-scriptbo blockquote:not(.dedication-block) {
   padding: 1rem;
   border-left: 2px solid hsl(var(--primary));
   background: rgba(var(--primary-rgb), 0.05);

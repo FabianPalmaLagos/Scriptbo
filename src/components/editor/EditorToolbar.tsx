@@ -140,6 +140,21 @@ export function EditorToolbar({ editor, className }: EditorToolbarProps) {
                     tooltip="Cita"
                 />
                 <ToolbarButton
+                    active={editor.isActive('blockquote', { class: 'dedication-block' })}
+                    onClick={() => {
+                        // Apply Dedication (Blockquote with 'dedication-block' class + Center Align default)
+                        // Using 'class' allows CSS full-page flex centering while permitting inner text alignment changes
+                        editor.chain().focus()
+                            .toggleBlockquote()
+                            .updateAttributes('blockquote', { class: 'dedication-block' })
+                            .setTextAlign('center') // Default to center, but user can change it
+                            .toggleItalic()
+                            .run();
+                    }}
+                    icon="stars"
+                    tooltip="Formato Dedicatoria (Centralizado)"
+                />
+                <ToolbarButton
                     onClick={() => editor.chain().focus().setHardBreak().run()}
                     icon="keyboard_return"
                     tooltip="Salto de Línea"

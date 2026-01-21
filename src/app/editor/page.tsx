@@ -5,9 +5,13 @@ import Link from 'next/link';
 import { Button, IconButton } from '@/components/ui';
 import { TiptapEditor } from '@/components/editor/TiptapEditor';
 import { AiSidebar } from '@/components/editor/AiSidebar';
+import { GlobalSearchModal } from '@/components/editor/GlobalSearchModal';
+import { StoryStateModal } from '@/components/editor/StoryStateModal';
 
 export default function EditorPage() {
     const [showAiPanel, setShowAiPanel] = useState(true);
+    const [isSearchModalOpen, setSearchModalOpen] = useState(false);
+    const [isStoryStateModalOpen, setStoryStateModalOpen] = useState(false);
     const [content, setContent] = useState<any>({
         type: 'doc',
         content: [
@@ -44,6 +48,9 @@ export default function EditorPage() {
 
     return (
         <div className="flex h-full w-full bg-[#0d0a1f]">
+            <GlobalSearchModal isOpen={isSearchModalOpen} onClose={() => setSearchModalOpen(false)} />
+            <StoryStateModal isOpen={isStoryStateModalOpen} onClose={() => setStoryStateModalOpen(false)} />
+
             {/* Left: Navigation / Structure (Collapsed) */}
             <aside className="hidden md:flex flex-col w-12 h-full border-r border-white/5 bg-[#0a0817] z-20 items-center py-4 gap-4">
                 <Link href="/dashboard" className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
@@ -52,7 +59,7 @@ export default function EditorPage() {
                 <div className="w-6 h-[1px] bg-white/5" />
                 <NavIcon icon="folder_open" active />
                 <NavIcon icon="auto_stories" />
-                <NavIcon icon="search" />
+                <NavIcon icon="search" onClick={() => setSearchModalOpen(true)} active={isSearchModalOpen} />
                 <NavIcon icon="settings" className="mt-auto" />
             </aside>
 
@@ -96,6 +103,15 @@ export default function EditorPage() {
                     <div className="flex items-center gap-3">
                         <Button variant="ghost" size="sm" icon="cloud_done" className="text-emerald-500 text-[10px] font-bold">Synced</Button>
                         <div className="w-[1px] h-4 bg-white/10" />
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon="bolt"
+                            className="text-amber-400 border-amber-400/20 bg-amber-400/5 hover:bg-amber-400/10"
+                            onClick={() => setStoryStateModalOpen(true)}
+                        >
+                            Update Context
+                        </Button>
                         <Button variant="secondary" size="sm" icon="visibility">Preview</Button>
                         <Button size="sm" icon="ios_share">Export</Button>
                         <IconButton
@@ -125,9 +141,12 @@ export default function EditorPage() {
 
 // Sub-components
 
-function NavIcon({ icon, active, className }: { icon: string; active?: boolean; className?: string }) {
+function NavIcon({ icon, active, className, onClick }: { icon: string; active?: boolean; className?: string; onClick?: () => void }) {
     return (
-        <button className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all ${active ? 'bg-[hsl(165,100%,38%)] text-[#0d0a1f] shadow-neon' : 'text-slate-400 hover:text-white hover:bg-white/5'} ${className}`}>
+        <button
+            onClick={onClick}
+            className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all ${active ? 'bg-[hsl(165,100%,38%)] text-[#0d0a1f] shadow-neon' : 'text-slate-400 hover:text-white hover:bg-white/5'} ${className}`}
+        >
             <span className="material-symbols-outlined text-[24px]">{icon}</span>
         </button>
     );

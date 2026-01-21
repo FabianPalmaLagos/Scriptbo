@@ -23,6 +23,8 @@ interface TiptapEditorProps {
     isAiPanelOpen?: boolean;
 }
 
+import Blockquote from '@tiptap/extension-blockquote';
+
 export function TiptapEditor({ content, onChange, className, placeholder = "Erase once, write twice...", isAiPanelOpen = false }: TiptapEditorProps) {
     const editor = useEditor({
         immediatelyRender: false,
@@ -30,6 +32,17 @@ export function TiptapEditor({ content, onChange, className, placeholder = "Eras
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3],
+                },
+                blockquote: false, // Disable default to use custom extension below
+            }),
+            // Custom Blockquote with class support
+            Blockquote.extend({
+                addAttributes() {
+                    return {
+                        class: {
+                            default: null,
+                        },
+                    };
                 },
             }),
             Placeholder.configure({

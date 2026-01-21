@@ -1,9 +1,17 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button, IconButton } from '@/components/ui';
+import { SmartImportModal } from '@/components/dashboard/SmartImportModal';
 
 export default function DashboardPage() {
+    const [isImportModalOpen, setImportModalOpen] = useState(false);
+
     return (
         <>
+            <SmartImportModal isOpen={isImportModalOpen} onClose={() => setImportModalOpen(false)} />
+
             <header className="relative z-10 flex items-center justify-between px-8 py-6 border-b border-white/5">
                 <h1 className="text-xl font-bold text-white tracking-tight">Projects</h1>
                 <div className="flex items-center gap-3">
@@ -15,6 +23,7 @@ export default function DashboardPage() {
                             className="bg-[hsl(252,29%,14%)] border border-white/5 rounded-lg py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-[hsl(165,100%,38%)]/50 transition-colors w-64"
                         />
                     </div>
+                    <Button icon="upload_file" variant="secondary" onClick={() => setImportModalOpen(true)}>Import PDF</Button>
                     <Button icon="add">New Project</Button>
                 </div>
             </header>
